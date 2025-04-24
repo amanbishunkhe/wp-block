@@ -20,6 +20,7 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { select  } from '@wordpress/data';
 import Booklist from '../components/BookList';
 export default function save({ attributes }) {
+	return null;
 	const books = select( 'core' ).getEntityRecords('postType','book');
 	return (
 		<div { ...useBlockProps.save() }>

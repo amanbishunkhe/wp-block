@@ -24,37 +24,44 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @see https://make.wordpress.org/core/2025/03/13/more-efficient-block-type-registration-in-6-8/
  * @see https://make.wordpress.org/core/2024/10/17/new-block-type-registration-apis-to-improve-performance-in-wordpress-6-7/
  */
-function create_block_my_reading_list_block_init() {
-	/**
-	 * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
-	 * based on the registered block metadata.
-	 * Added in WordPress 6.8 to simplify the block metadata registration process added in WordPress 6.7.
-	 *
-	 * @see https://make.wordpress.org/core/2025/03/13/more-efficient-block-type-registration-in-6-8/
-	 */
-	if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
-		wp_register_block_types_from_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
-		return;
-	}
+// function create_block_my_reading_list_block_init() {
+// 	/**
+// 	 * Registers the block(s) metadata from the `blocks-manifest.php` and registers the block type(s)
+// 	 * based on the registered block metadata.
+// 	 * Added in WordPress 6.8 to simplify the block metadata registration process added in WordPress 6.7.
+// 	 *
+// 	 * @see https://make.wordpress.org/core/2025/03/13/more-efficient-block-type-registration-in-6-8/
+// 	 */
+// 	if ( function_exists( 'wp_register_block_types_from_metadata_collection' ) ) {
+// 		wp_register_block_types_from_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
+// 		return;
+// 	}
 
-	/**
-	 * Registers the block(s) metadata from the `blocks-manifest.php` file.
-	 * Added to WordPress 6.7 to improve the performance of block type registration.
-	 *
-	 * @see https://make.wordpress.org/core/2024/10/17/new-block-type-registration-apis-to-improve-performance-in-wordpress-6-7/
-	 */
-	if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
-		wp_register_block_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
-	}
-	/**
-	 * Registers the block type(s) in the `blocks-manifest.php` file.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/register_block_type/
-	 */
-	$manifest_data = require __DIR__ . '/build/blocks-manifest.php';
-	foreach ( array_keys( $manifest_data ) as $block_type ) {
-		register_block_type( __DIR__ . "/build/{$block_type}" );
-	}
+// 	/**
+// 	 * Registers the block(s) metadata from the `blocks-manifest.php` file.
+// 	 * Added to WordPress 6.7 to improve the performance of block type registration.
+// 	 *
+// 	 * @see https://make.wordpress.org/core/2024/10/17/new-block-type-registration-apis-to-improve-performance-in-wordpress-6-7/
+// 	 */
+// 	if ( function_exists( 'wp_register_block_metadata_collection' ) ) {
+// 		wp_register_block_metadata_collection( __DIR__ . '/build', __DIR__ . '/build/blocks-manifest.php' );
+// 	}
+// 	/**
+// 	 * Registers the block type(s) in the `blocks-manifest.php` file.
+// 	 *
+// 	 * @see https://developer.wordpress.org/reference/functions/register_block_type/
+// 	 */
+// 	$manifest_data = require __DIR__ . '/build/blocks-manifest.php';
+// 	foreach ( array_keys( $manifest_data ) as $block_type ) {
+// 		register_block_type( __DIR__ . '/build', array( 'render_callback' => 'my_reading_list_render_callback' ) );
+// 	}
+// }
+// add_action( 'init', 'create_block_my_reading_list_block_init' );
+
+function create_block_my_reading_list_block_init() {
+    register_block_type( __DIR__ . '/build/my-reading-list', array(
+        'render_callback' => 'my_reading_list_render_callback',
+    ) );
 }
 add_action( 'init', 'create_block_my_reading_list_block_init' );
 
@@ -99,4 +106,35 @@ function my_reading_list_get_book_featured_image_src( $object ) {
         return $img[0];
     }
     return false;
+}
+
+
+function my_reading_list_render_callback( $attributes ){
+	$args = array(
+		'post_type'		=> 'book'
+	);
+
+	$books = get_posts( $args );
+	$wrapper_attributes = get_block_wrapper_attributes( );
+
+	$output = '';
+	$output .= sprintf('<div %1$s>', $wrapper_attributes );
+	$output .= '<p>My Reading List</p>';
+
+		// echo '<pre>';
+		// print_r($books);
+		// echo '</pre>';
+
+		foreach ( $books as $book ) {
+			$output .= '<div class="book">';
+			if( $attributes['showImage'] ){
+				$output .= get_the_post_thumbnail($book->ID, 'medium' );
+			}
+			$output .= sprintf('<h2>%1$s</h2>', $book->post_title );
+			$output .= sprintf('<p>%1$s</p>', $book->post_content );
+			$output .= '</div>';
+		}
+
+	$output .='</div>';
+	return $output;
 }
