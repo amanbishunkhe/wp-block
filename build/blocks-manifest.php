@@ -21,6 +21,10 @@ return array(
 			'showImage' => array(
 				'type' => 'boolean',
 				'default' => true
+			),
+			'selectBook' => array(
+				'type' => 'string',
+				'default' => ''
 			)
 		),
 		'supports' => array(

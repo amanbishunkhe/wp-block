@@ -16,6 +16,10 @@
 		"showImage": {
 			"type": "boolean",
 			"default": true
+		},
+		"selectBook": {	
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {

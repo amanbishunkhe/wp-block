@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
  */
 import { useBlockProps,InspectorControls } from '@wordpress/block-editor';
-import{ Panel,PanelBody,ToggleControl } from '@wordpress/components';
+import{ Panel,PanelBody,ToggleControl,SelectControl } from '@wordpress/components';
 
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -44,7 +44,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			select( coreDataStore ).getEntityRecords( 'postType', 'book' )
 		)
 	},[]);
-
+	console.log(books,'new bbk');
 	const setShowImageHandler = ( val )=>{
 		setAttributes( { showImage: val } );	
 	};
@@ -69,6 +69,20 @@ export default function Edit( { attributes, setAttributes } ) {
 							checked={ attributes.showContent }
 							onChange={ setShowContentHandler }
 						/>				
+					</PanelBody>
+					<PanelBody title={__( 'Book List','my-reading-list' )} >
+						<SelectControl
+							label={__( 'Select Book','my-reading-list' )}
+							value={ attributes.selectBook }
+							options={[
+								{ label: 'Select Book', value: '' },
+								...(Array.isArray(books) ? books.map((book) => ({
+									label: book.title?.rendered || 'Untitled',
+									value: book.id?.toString() || '',
+								})) : []),
+
+							]}
+						/>	
 					</PanelBody>
 				</Panel>
 			</InspectorControls>
